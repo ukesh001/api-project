@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weblink Manager</title>
+</head>
+<body>
+    <h1>Manage Weblinks</h1>
+
+    <!-- Form to add a new weblink -->
+    <form id="weblink-form">
+        <input type="text" id="url" placeholder="Enter URL" required>
+        <input type="text" id="description" placeholder="Enter Description" required>
+        <button type="submit">Add Weblink</button>
+    </form>
+
+    <h2>Weblinks List</h2>
+    <ul id="weblink-list"></ul>
+
+    <script>
+        // Fetch weblinks from the API and display them
+        async function fetchWeblinks() {
+            const response = await fetch('http://localhost:3000/weblinks');
+            const weblinks = await response.json();
+            const list = document.getElementById('weblink-list');
+            list.innerHTML = '';  // Clear the list before adding new items
+            weblinks.forEach(weblink => {
+                const item = document.createElement('li');
+                item.textContent = `${weblink.url} - ${weblink.description}`;
+                list.appendChild(item);
+            });
+        }
+
+        // Handle form submission to add a new weblink
+        document.getElementById('weblink-form').addEventListener('submit', async (e) => {
+            e.preventDefault();  // Prevent default form submission
+            const url = document.getElementById('url').value;
+            const description = document.getElementById('description').value;
+
+            // Send POST request to the API to add a new weblink
+            await fetch('http://localhost:3000/weblinks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url, description })
+            });
+
+            // Clear form fields after submission
+            document.getElementById('url').value = '';
+            document.getElementById('description').value = '';
+
+            // Fetch and display the updated weblinks
+            fetchWeblinks();
+        });
+
+        // Initialize by fetching weblinks on page load
+        fetchWeblinks();
+    </script>
+</body>
+</html>
